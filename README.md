@@ -16,10 +16,17 @@ python -m pytest tests -q
 python detector/detector.py logs/auth.log findings.json
 ```
 
-## 基线状态
+## 检测逻辑
 
-`detector/detector.py` 对每条失败登录和每个请求各产出一条告警，不做任何关联：
-不看失败之后有没有成功登录，不看同账号是否跨主机，也不看请求路径是否敏感。
+`detector/detector.py` 先聚合再关联，产出 `findings` + `needs_review`:
+
+- `dns_tunnel`: 按 (源 IP, 目标域) 聚合查询，三因子加权 ——
+  查询频率 0.30 / 子域熵 0.40 / 目标域集中度 0.30，≥0.75 且 ≥8 条才告警；
+  CDN/监控域走白名单直接排除。
+- `lateral_movement`: 同账号 120 秒内跨主机登录，且与隧道告警关联或双 IP 稀有，
+  避免 svc-dns 常规跨机登录误报。
+- 每条告警含时间窗口、实体、按序事件链和各因子权重；拿不准的进
+  `needs_review` 并写明缺什么证据。
 
 ## 标注事件
 
