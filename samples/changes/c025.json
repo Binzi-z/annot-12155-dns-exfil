@@ -1,0 +1,16 @@
+{
+  "id": "c025",
+  "kind": "vulnerable",
+  "file": "src/routes/reports.js",
+  "line": 45,
+  "ruleId": "PT-FS-READ-001",
+  "sink": "Promise.then(... fs.readFileSync ...)",
+  "summary": "引入路径穿越：流式报表：请求参数经 Promise 链传到 readFileSync",
+  "source": "req.query.report（经 Promise 链）",
+  "entry": "GET /api/reports/stream",
+  "before": "  const name = forward(req.query.report);\n  Promise.resolve(name)\n    .then((value) => path.join(DATA_DIR, \"streams\", \"latest.csv\"))\n    .then((target) => fs.readFileSync(target, \"utf8\"))",
+  "after": "router.get(\"/api/reports/stream\", (req, res) => {\n  const name = forward(req.query.report);\n  Promise.resolve(name)\n    .then((value) => path.join(DATA_DIR, \"streams\", value))\n    .then((target) => fs.readFileSync(target, \"utf8\"))",
+  "expect": {
+    "vulnerable": true
+  }
+}

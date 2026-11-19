@@ -1,0 +1,16 @@
+{
+  "id": "c009",
+  "kind": "vulnerable",
+  "file": "src/routes/plugins.js",
+  "line": 15,
+  "ruleId": "PT-DYNAMIC-REQUIRE-004",
+  "sink": "require(path.join(PLUGIN_DIR, name))",
+  "summary": "引入路径穿越：插件加载：路由参数直接决定模块路径",
+  "source": "req.params.name",
+  "entry": "GET /api/plugins/:name",
+  "before": "  const { name } = req.params;\n  const plugin = require(path.join(PLUGIN_DIR, \"csv\"));",
+  "after": "router.get(\"/api/plugins/:name\", (req, res) => {\n  const { name } = req.params;\n  const plugin = require(path.join(PLUGIN_DIR, name));",
+  "expect": {
+    "vulnerable": true
+  }
+}

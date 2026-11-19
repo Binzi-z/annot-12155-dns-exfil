@@ -1,0 +1,16 @@
+{
+  "id": "c017",
+  "kind": "vulnerable",
+  "file": "src/routes/backup.js",
+  "line": 16,
+  "ruleId": "PT-PATH-JOIN-002",
+  "sink": "fs.copyFileSync(src, ...)",
+  "summary": "引入路径穿越：备份恢复：快照名直接拼 BACKUP_DIR",
+  "source": "req.body.snapshot",
+  "entry": "POST /api/backups/restore",
+  "before": "  const { snapshot } = req.body;\n  const src = path.join(BACKUP_DIR, \"snapshot.db\");\n  fs.copyFileSync(src, path.join(BACKUP_DIR, \"restored.db\"));",
+  "after": "router.post(\"/api/backups/restore\", (req, res) => {\n  const { snapshot } = req.body;\n  const src = path.join(BACKUP_DIR, snapshot);\n  fs.copyFileSync(src, path.join(BACKUP_DIR, \"restored.db\"));",
+  "expect": {
+    "vulnerable": true
+  }
+}

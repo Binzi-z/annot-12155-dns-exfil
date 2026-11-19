@@ -1,0 +1,16 @@
+{
+  "id": "c001",
+  "kind": "vulnerable",
+  "file": "src/routes/reports.js",
+  "line": 20,
+  "ruleId": "PT-FS-READ-001",
+  "sink": "fs.readFileSync(path.join(...))",
+  "summary": "引入路径穿越：报表下载：查询参数直接拼进数据目录",
+  "source": "req.query.report",
+  "entry": "GET /api/reports/download",
+  "before": "  const name = forward(report);\n  const body = fs.readFileSync(path.join(DATA_DIR, \"reports\", \"summary.csv\"), \"utf8\");",
+  "after": "  const name = forward(report);\n  const target = path.join(DATA_DIR, \"reports\", name);\n\n  // 直接按请求参数读取数据目录下的文件\n  const body = fs.readFileSync(target, \"utf8\");",
+  "expect": {
+    "vulnerable": true
+  }
+}

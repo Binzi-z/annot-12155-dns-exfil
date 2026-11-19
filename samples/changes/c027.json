@@ -1,0 +1,15 @@
+{
+  "id": "c027",
+  "kind": "safe",
+  "file": "src/lib/registry.js",
+  "line": 20,
+  "ruleId": "PT-DYNAMIC-REQUIRE-004",
+  "sink": "已净化的同类 sink",
+  "summary": "加固路径：loadPlugin 先校验 ALLOWED_PLUGINS 再 require",
+  "before": "function loadPlugin(name) {\n  const key = forward(name);\n  return require(path.join(PLUGIN_DIR, key));\n}",
+  "after": "function loadPlugin(name) {\n  const key = forward(name);\n  if (!ALLOWED_PLUGINS.has(key)) {\n    const err = new Error(\"plugin not allowed: \" + key);\n    err.code = \"EPLUGIN\";\n    throw err;\n  }\n  return require(path.join(PLUGIN_DIR, key));",
+  "expect": {
+    "vulnerable": false,
+    "reason": "loadPlugin 先校验 ALLOWED_PLUGINS 再 require"
+  }
+}

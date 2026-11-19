@@ -1,0 +1,16 @@
+{
+  "id": "c012",
+  "kind": "vulnerable",
+  "file": "src/routes/archive.js",
+  "line": 27,
+  "ruleId": "PT-ZIP-SLIP-006",
+  "sink": "fs.promises.writeFile(path.join(EXTRACT_DIR, item.path), ...)",
+  "summary": "引入路径穿越：归档恢复：请求体条目路径直接落盘",
+  "source": "req.body.entries[].path",
+  "entry": "POST /api/archive/restore",
+  "before": "  for (const item of entries) {\n    const target = path.join(EXTRACT_DIR, path.basename(item.path));\n    await fs.promises.writeFile(target, Buffer.from(item.data, \"base64\"));",
+  "after": "  for (const item of entries) {\n    await fs.promises.mkdir(path.dirname(path.join(EXTRACT_DIR, item.path)), { recursive: true });\n    await fs.promises.writeFile(path.join(EXTRACT_DIR, item.path), Buffer.from(item.data, \"base64\"));",
+  "expect": {
+    "vulnerable": true
+  }
+}

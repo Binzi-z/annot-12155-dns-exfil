@@ -1,0 +1,15 @@
+{
+  "id": "c029",
+  "kind": "safe",
+  "file": "src/admin/exports.js",
+  "line": 13,
+  "ruleId": "PT-SEND-FILE-003",
+  "sink": "已净化的同类 sink",
+  "summary": "加固路径：sendFile 前已用 resolveWithin 做 path.resolve + 前缀校验",
+  "before": "router.get(\"/exports/invoice\", (req, res) => {\n  const name = forward(req.query.invoice);\n  return res.sendFile(path.join(EXPORT_DIR, \"invoices\", name));\n});",
+  "after": "router.get(\"/exports/invoice\", (req, res) => {\n  const name = forward(req.query.invoice);\n  const target = resolveWithin(EXPORT_DIR, \"invoices\", name);\n  return res.sendFile(target);",
+  "expect": {
+    "vulnerable": false,
+    "reason": "sendFile 前已用 resolveWithin 做 path.resolve + 前缀校验"
+  }
+}

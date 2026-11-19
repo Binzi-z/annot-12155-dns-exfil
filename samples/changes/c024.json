@@ -1,0 +1,16 @@
+{
+  "id": "c024",
+  "kind": "vulnerable",
+  "file": "src/ts/static-assets.ts",
+  "line": 14,
+  "ruleId": "PT-STATIC-ROOT-005",
+  "sink": "express.static(root)",
+  "summary": "引入路径穿越：静态目录：x-tenant-id 请求头直接作为根目录",
+  "source": "x-tenant-id",
+  "entry": "mountTenantAssets()",
+  "before": "    const tenant = String(req.headers[\"x-tenant-id\"] || \"public\");\n    const root = path.join(DATA_DIR, \"public\", \"default\");\n    express.static(root)(req, res, next);",
+  "after": "    const tenant = String(req.headers[\"x-tenant-id\"] || \"public\");\n    const root = path.join(DATA_DIR, \"public\", tenant);\n    express.static(root)(req, res, next);",
+  "expect": {
+    "vulnerable": true
+  }
+}

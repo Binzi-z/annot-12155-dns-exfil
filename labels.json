@@ -1,19 +1,318 @@
 {
-  "events": [
+  "total": 25,
+  "rules": {
+    "PT-FS-READ-001": {
+      "name": "path-traversal-fs-read",
+      "shortDescription": "fs 读文件时使用了未净化的动态路径",
+      "help": "用户可控片段参与 fs.readFile/readFileSync/createReadStream 的路径计算，且没有 resolve + 前缀校验。"
+    },
+    "PT-PATH-JOIN-002": {
+      "name": "path-traversal-fs-write",
+      "shortDescription": "path.join 结果未做目录边界校验就用于写/复制/改名",
+      "help": "写文件、复制、改名、删除等操作的目标路径包含未净化输入，可跳出预期目录。"
+    },
+    "PT-SEND-FILE-003": {
+      "name": "path-traversal-send-file",
+      "shortDescription": "sendFile/download 使用了动态路径",
+      "help": "res.sendFile / res.download 的目标路径由请求参数决定，未做白名单或前缀校验。"
+    },
+    "PT-DYNAMIC-REQUIRE-004": {
+      "name": "path-traversal-dynamic-require",
+      "shortDescription": "require 的模块路径包含动态输入",
+      "help": "require 的参数由请求、函数入参或环境配置拼成，可加载预期插件目录之外的文件。"
+    },
+    "PT-STATIC-ROOT-005": {
+      "name": "path-traversal-static-root",
+      "shortDescription": "express.static 的根目录来自动态输入",
+      "help": "静态目录中间件的 root 由租户参数或请求头决定，未做目录边界校验。"
+    },
+    "PT-ZIP-SLIP-006": {
+      "name": "path-traversal-zip-slip",
+      "shortDescription": "压缩包条目路径未校验即落盘",
+      "help": "解压时直接使用 entryName / entry.path 拼目标路径，可写出 .. 目录。"
+    },
+    "PT-TEMPLATE-INCLUDE-007": {
+      "name": "path-traversal-template-include",
+      "shortDescription": "模板 include 的文件名来自动态输入",
+      "help": "模板渲染器按用户提供的名字读取 .hbs 片段，未限制在模板目录内。"
+    }
+  },
+  "vulns": [
     {
-      "kind": "dns_tunnel",
-      "ip": "10.20.1.51",
-      "evidence": "12 条超长子域查询指向同一外部域"
+      "id": "v01",
+      "ruleId": "PT-FS-READ-001",
+      "sink": "fs.readFileSync(path.join(...))",
+      "label": "报表下载：查询参数直接拼进数据目录",
+      "file": "src/routes/reports.js",
+      "line": 20,
+      "source": "req.query.report",
+      "entry": "GET /api/reports/download",
+      "severity": "high"
     },
     {
-      "kind": "lateral_movement",
-      "ips": [
-        "10.20.1.51",
-        "10.20.1.52"
-      ],
-      "user": "svc-dns",
-      "evidence": "同一个 key 在 40 秒内登录两台主机"
+      "id": "v02",
+      "ruleId": "PT-FS-READ-001",
+      "sink": "fs.readFile(DATA_DIR + '/raw/' + file)",
+      "label": "原始报表：字符串拼接后 readFile",
+      "file": "src/routes/reports.js",
+      "line": 28,
+      "source": "req.query.file（经 fileParam）",
+      "entry": "GET /api/reports/raw",
+      "severity": "high"
+    },
+    {
+      "id": "v03",
+      "ruleId": "PT-FS-READ-001",
+      "sink": "fs.createReadStream(path.join(...))",
+      "label": "报表预览：路由参数直接拼路径",
+      "file": "src/routes/reports.js",
+      "line": 36,
+      "source": "req.params.name",
+      "entry": "GET /api/reports/preview/:name",
+      "severity": "high"
+    },
+    {
+      "id": "v04",
+      "ruleId": "PT-SEND-FILE-003",
+      "sink": "res.sendFile(path.join(...))",
+      "label": "发票下载：动态路径交给 sendFile",
+      "file": "src/routes/exports.js",
+      "line": 15,
+      "source": "req.query.invoice",
+      "entry": "GET /api/exports/invoice",
+      "severity": "high"
+    },
+    {
+      "id": "v05",
+      "ruleId": "PT-SEND-FILE-003",
+      "sink": "res.download(path.join(...))",
+      "label": "对账单下载：期间参数拼进归档路径",
+      "file": "src/routes/exports.js",
+      "line": 21,
+      "source": "req.params.period",
+      "entry": "GET /api/exports/statement/:period",
+      "severity": "high"
+    },
+    {
+      "id": "v06",
+      "ruleId": "PT-PATH-JOIN-002",
+      "sink": "fs.promises.writeFile(dest, ...)",
+      "label": "上传落盘：originalname 直接拼 UPLOAD_DIR",
+      "file": "src/routes/uploads.js",
+      "line": 23,
+      "source": "multipart originalname",
+      "entry": "POST /api/uploads",
+      "severity": "high"
+    },
+    {
+      "id": "v07",
+      "ruleId": "PT-PATH-JOIN-002",
+      "sink": "fs.promises.copyFile(from, to)",
+      "label": "附件复制：请求体两个文件名都未净化",
+      "file": "src/routes/uploads.js",
+      "line": 30,
+      "source": "req.body.from / req.body.to",
+      "entry": "POST /api/uploads/copy",
+      "severity": "high"
+    },
+    {
+      "id": "v08",
+      "ruleId": "PT-PATH-JOIN-002",
+      "sink": "fs.promises.rename(...)",
+      "label": "附件改名：旧名与新名都可穿越",
+      "file": "src/routes/uploads.js",
+      "line": 36,
+      "source": "req.body.oldName / req.body.newName",
+      "entry": "POST /api/uploads/rename",
+      "severity": "high"
+    },
+    {
+      "id": "v09",
+      "ruleId": "PT-DYNAMIC-REQUIRE-004",
+      "sink": "require(path.join(PLUGIN_DIR, name))",
+      "label": "插件加载：路由参数直接决定模块路径",
+      "file": "src/routes/plugins.js",
+      "line": 15,
+      "source": "req.params.name",
+      "entry": "GET /api/plugins/:name",
+      "severity": "high"
+    },
+    {
+      "id": "v10",
+      "ruleId": "PT-DYNAMIC-REQUIRE-004",
+      "sink": "require('../../plugins/' + selected)",
+      "label": "插件选择：字符串拼接后 require",
+      "file": "src/routes/plugins.js",
+      "line": 21,
+      "source": "req.body.plugin",
+      "entry": "POST /api/plugins/select",
+      "severity": "high"
+    },
+    {
+      "id": "v11",
+      "ruleId": "PT-ZIP-SLIP-006",
+      "sink": "fs.promises.writeFile(path.join(EXTRACT_DIR, entry.entryName), ...)",
+      "label": "压缩包解压：条目路径未做边界校验",
+      "file": "src/routes/archive.js",
+      "line": 18,
+      "source": "zip entryName",
+      "entry": "POST /api/archive/extract",
+      "severity": "high"
+    },
+    {
+      "id": "v12",
+      "ruleId": "PT-ZIP-SLIP-006",
+      "sink": "fs.promises.writeFile(path.join(EXTRACT_DIR, item.path), ...)",
+      "label": "归档恢复：请求体条目路径直接落盘",
+      "file": "src/routes/archive.js",
+      "line": 27,
+      "source": "req.body.entries[].path",
+      "entry": "POST /api/archive/restore",
+      "severity": "high"
+    },
+    {
+      "id": "v13",
+      "ruleId": "PT-STATIC-ROOT-005",
+      "sink": "express.static(root)",
+      "label": "静态目录：租户参数直接作为 static 根目录",
+      "file": "src/routes/assets.js",
+      "line": 15,
+      "source": "req.params.tenant",
+      "entry": "USE /assets/:tenant",
+      "severity": "high"
+    },
+    {
+      "id": "v14",
+      "ruleId": "PT-SEND-FILE-003",
+      "sink": "res.sendFile(path.resolve(...))",
+      "label": "资源发送：path.resolve 后未校验前缀",
+      "file": "src/routes/assets.js",
+      "line": 20,
+      "source": "req.query.path",
+      "entry": "GET /api/assets/file",
+      "severity": "high"
+    },
+    {
+      "id": "v15",
+      "ruleId": "PT-FS-READ-001",
+      "sink": "fs.readFileSync(path.join(LOG_DIR, ...))",
+      "label": "日志查看：服务名直接拼日志文件",
+      "file": "src/routes/logs.js",
+      "line": 15,
+      "source": "req.params.service",
+      "entry": "GET /api/logs/:service",
+      "severity": "high"
+    },
+    {
+      "id": "v16",
+      "ruleId": "PT-FS-READ-001",
+      "sink": "fs.createReadStream(LOG_DIR + ...)",
+      "label": "按日期查日志：日期参数直接拼路径",
+      "file": "src/routes/logs.js",
+      "line": 21,
+      "source": "req.params.date",
+      "entry": "GET /api/logs/date/:date",
+      "severity": "high"
+    },
+    {
+      "id": "v17",
+      "ruleId": "PT-PATH-JOIN-002",
+      "sink": "fs.copyFileSync(src, ...)",
+      "label": "备份恢复：快照名直接拼 BACKUP_DIR",
+      "file": "src/routes/backup.js",
+      "line": 16,
+      "source": "req.body.snapshot",
+      "entry": "POST /api/backups/restore",
+      "severity": "high"
+    },
+    {
+      "id": "v18",
+      "ruleId": "PT-PATH-JOIN-002",
+      "sink": "fs.cpSync(path.join(...), path.join(...))",
+      "label": "备份导出：目标目录名来自请求体",
+      "file": "src/routes/backup.js",
+      "line": 22,
+      "source": "req.body.name",
+      "entry": "POST /api/backups/export",
+      "severity": "high"
+    },
+    {
+      "id": "v19",
+      "ruleId": "PT-TEMPLATE-INCLUDE-007",
+      "sink": "fs.readFileSync(path.join(TEMPLATE_DIR, name + '.hbs'))",
+      "label": "模板渲染：主题名直接决定 include 文件",
+      "file": "src/lib/template-engine.js",
+      "line": 28,
+      "source": "req.query.theme（routes/templates.js）",
+      "entry": "GET /api/templates/preview",
+      "severity": "high"
+    },
+    {
+      "id": "v20",
+      "ruleId": "PT-TEMPLATE-INCLUDE-007",
+      "sink": "fs.readFileSync(path.join(TEMPLATE_DIR, 'partials', ...))",
+      "label": "局部模板：片段名直接决定 include 文件",
+      "file": "src/lib/template-engine.js",
+      "line": 36,
+      "source": "req.body.partial（routes/templates.js）",
+      "entry": "POST /api/templates/partial",
+      "severity": "high"
+    },
+    {
+      "id": "v21",
+      "ruleId": "PT-FS-READ-001",
+      "sink": "fs.readFileSync(file)",
+      "label": "多租户报表：请求头租户与查询参数共同决定文件",
+      "file": "src/ts/report-service.ts",
+      "line": 21,
+      "source": "x-tenant-id + req.query.report",
+      "entry": "readTenantReport()",
+      "severity": "high"
+    },
+    {
+      "id": "v22",
+      "ruleId": "PT-DYNAMIC-REQUIRE-004",
+      "sink": "require(path.join(DATA_DIR, 'exporters', name))",
+      "label": "导出器加载：函数参数直接拼模块路径",
+      "file": "src/ts/report-service.ts",
+      "line": 25,
+      "source": "loadExporter(name) 入参",
+      "entry": "loadExporter()",
+      "severity": "high"
+    },
+    {
+      "id": "v23",
+      "ruleId": "PT-DYNAMIC-REQUIRE-004",
+      "sink": "require(path.join(PLUGIN_ROOT, configured))",
+      "label": "插件加载：环境变量配置决定模块路径",
+      "file": "src/ts/plugin-loader.ts",
+      "line": 12,
+      "source": "process.env.PLUGIN_NAME",
+      "entry": "loadConfiguredPlugin()",
+      "severity": "high"
+    },
+    {
+      "id": "v24",
+      "ruleId": "PT-STATIC-ROOT-005",
+      "sink": "express.static(root)",
+      "label": "静态目录：x-tenant-id 请求头直接作为根目录",
+      "file": "src/ts/static-assets.ts",
+      "line": 14,
+      "source": "x-tenant-id",
+      "entry": "mountTenantAssets()",
+      "severity": "high"
+    },
+    {
+      "id": "v25",
+      "ruleId": "PT-FS-READ-001",
+      "sink": "Promise.then(... fs.readFileSync ...)",
+      "label": "流式报表：请求参数经 Promise 链传到 readFileSync",
+      "file": "src/routes/reports.js",
+      "line": 45,
+      "source": "req.query.report（经 Promise 链）",
+      "entry": "GET /api/reports/stream",
+      "severity": "high"
     }
   ],
-  "note": "benign look-alikes are intentionally unlabelled"
+  "note": "src/admin、src/lib/registry.js、src/lib/template-engine.js 的 renderKnown 与 src/ts/safe-report.ts 是同一批 sink 的净化写法（decoy），故意不标注。"
 }

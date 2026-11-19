@@ -1,0 +1,16 @@
+{
+  "id": "c006",
+  "kind": "vulnerable",
+  "file": "src/routes/uploads.js",
+  "line": 23,
+  "ruleId": "PT-PATH-JOIN-002",
+  "sink": "fs.promises.writeFile(dest, ...)",
+  "summary": "引入路径穿越：上传落盘：originalname 直接拼 UPLOAD_DIR",
+  "source": "multipart originalname",
+  "entry": "POST /api/uploads",
+  "before": "  const name = uploadName(req.file);\n  await fs.promises.writeFile(path.join(UPLOAD_DIR, \"incoming\", \"upload.bin\"), req.file.buffer);",
+  "after": "router.post(\"/api/uploads\", upload.single(\"file\"), async (req, res) => {\n  const name = uploadName(req.file);\n  const dest = path.join(UPLOAD_DIR, \"incoming\", name);\n\n  await fs.promises.writeFile(dest, req.file.buffer);",
+  "expect": {
+    "vulnerable": true
+  }
+}

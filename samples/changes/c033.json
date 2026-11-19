@@ -1,0 +1,15 @@
+{
+  "id": "c033",
+  "kind": "safe",
+  "file": "src/admin/assets.js",
+  "line": 18,
+  "ruleId": "PT-STATIC-ROOT-005",
+  "sink": "已净化的同类 sink",
+  "summary": "加固路径：static 根目录来自固定 TENANT_ROOTS 映射",
+  "before": "router.use(\"/assets/:tenant\", (req, res, next) => {\n  const root = path.join(DATA_DIR, \"public\", req.params.tenant);\n  express.static(root)(req, res, next);\n});",
+  "after": "router.use(\"/assets/:tenant\", (req, res, next) => {\n  const root = TENANT_ROOTS.get(req.params.tenant);\n  if (!root) return res.status(404).end();\n  express.static(root)(req, res, next);",
+  "expect": {
+    "vulnerable": false,
+    "reason": "static 根目录来自固定 TENANT_ROOTS 映射"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "c034",
+  "kind": "safe",
+  "file": "src/admin/logs.js",
+  "line": 17,
+  "ruleId": "PT-FS-READ-001",
+  "sink": "已净化的同类 sink",
+  "summary": "加固路径：服务名先校验 SERVICES 白名单",
+  "before": "router.get(\"/logs/:service\", (req, res) => {\n  const { service } = req.params;\n  const body = fs.readFileSync(path.join(LOG_DIR, service + \".log\"), \"utf8\");\n  res.type(\"text/plain\").send(body);\n});",
+  "after": "router.get(\"/logs/:service\", (req, res) => {\n  const { service } = req.params;\n  if (!SERVICES.has(service)) {\n    return res.status(404).json({ error: \"unknown service\" });\n  }\n  const body = fs.readFileSync(path.join(LOG_DIR, service + \".log\"), \"utf8\");\n  res.type(\"text/plain\").send(body);",
+  "expect": {
+    "vulnerable": false,
+    "reason": "服务名先校验 SERVICES 白名单"
+  }
+}

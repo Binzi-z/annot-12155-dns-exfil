@@ -1,0 +1,13 @@
+{
+  "id": "c043",
+  "kind": "benign",
+  "file": "src/lib/template-engine.js",
+  "line": 13,
+  "summary": "KNOWN_TEMPLATES 新增 dashboard",
+  "before": "  notice: \"notice.hbs\",",
+  "after": "  notice: \"notice.hbs\",\n  dashboard: \"dashboard.hbs\",",
+  "expect": {
+    "vulnerable": false,
+    "reason": "与路径无关的重构，不涉及 sink"
+  }
+}

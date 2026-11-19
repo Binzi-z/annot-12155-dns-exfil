@@ -1,0 +1,15 @@
+{
+  "id": "c028",
+  "kind": "safe",
+  "file": "src/admin/reports.js",
+  "line": 14,
+  "ruleId": "PT-FS-READ-001",
+  "sink": "已净化的同类 sink",
+  "summary": "加固路径：download 前已用 resolveWithin 做 path.resolve + 前缀校验",
+  "before": "router.get(\"/reports/download\", (req, res) => {\n  const name = forward(req.query.report);\n  const body = fs.readFileSync(path.join(DATA_DIR, \"reports\", name), \"utf8\");\n  res.type(\"text/csv\").send(body);\n});",
+  "after": "router.get(\"/reports/download\", (req, res) => {\n  const name = forward(req.query.report);\n  const target = resolveWithin(DATA_DIR, \"reports\", name);\n  const body = fs.readFileSync(target, \"utf8\");",
+  "expect": {
+    "vulnerable": false,
+    "reason": "download 前已用 resolveWithin 做 path.resolve + 前缀校验"
+  }
+}

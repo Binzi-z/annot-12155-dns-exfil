@@ -1,0 +1,13 @@
+{
+  "id": "c040",
+  "kind": "benign",
+  "file": "src/lib/util.js",
+  "line": 23,
+  "summary": "forward 增加 String + trim 兜底",
+  "before": "  return value;",
+  "after": "  return String(value).trim();",
+  "expect": {
+    "vulnerable": false,
+    "reason": "与路径无关的重构，不涉及 sink"
+  }
+}

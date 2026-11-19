@@ -1,0 +1,13 @@
+{
+  "id": "c038",
+  "kind": "benign",
+  "file": "src/index.js",
+  "line": 50,
+  "summary": "健康检查返回值去掉版本号",
+  "before": "app.get(\"/healthz\", (req, res) => res.json({ ok: true, version: \"2.3.0\" }));",
+  "after": "app.get(\"/healthz\", (req, res) => res.json({ ok: true }));",
+  "expect": {
+    "vulnerable": false,
+    "reason": "与路径无关的重构，不涉及 sink"
+  }
+}

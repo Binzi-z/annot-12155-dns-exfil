@@ -1,0 +1,16 @@
+{
+  "id": "c015",
+  "kind": "vulnerable",
+  "file": "src/routes/logs.js",
+  "line": 15,
+  "ruleId": "PT-FS-READ-001",
+  "sink": "fs.readFileSync(path.join(LOG_DIR, ...))",
+  "summary": "引入路径穿越：日志查看：服务名直接拼日志文件",
+  "source": "req.params.service",
+  "entry": "GET /api/logs/:service",
+  "before": "  const { service } = req.params;\n  const body = fs.readFileSync(path.join(LOG_DIR, \"api.log\"), \"utf8\");",
+  "after": "router.get(\"/api/logs/:service\", (req, res) => {\n  const { service } = req.params;\n  const body = fs.readFileSync(path.join(LOG_DIR, service + \".log\"), \"utf8\");",
+  "expect": {
+    "vulnerable": true
+  }
+}

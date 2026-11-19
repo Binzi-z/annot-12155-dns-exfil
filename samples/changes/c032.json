@@ -1,0 +1,15 @@
+{
+  "id": "c032",
+  "kind": "safe",
+  "file": "src/admin/archive.js",
+  "line": 18,
+  "ruleId": "PT-ZIP-SLIP-006",
+  "sink": "已净化的同类 sink",
+  "summary": "加固路径：每个 zip 条目先过 resolveWithin 再写文件",
+  "before": "router.post(\"/archive/extract\", async (req, res) => {\n  const zip = new AdmZip(Buffer.from(req.body.archive, \"base64\"));\n  for (const entry of zip.getEntries()) {\n    await fs.promises.writeFile(path.join(EXTRACT_DIR, entry.entryName), entry.getData());\n  }\n  res.json({ extracted: zip.getEntries().length });\n});",
+  "after": "router.post(\"/archive/extract\", async (req, res) => {\n  const zip = new AdmZip(Buffer.from(req.body.archive, \"base64\"));\n  for (const entry of zip.getEntries()) {\n    const target = resolveWithin(EXTRACT_DIR, entry.entryName);\n    await fs.promises.writeFile(target, entry.getData());\n  }",
+  "expect": {
+    "vulnerable": false,
+    "reason": "每个 zip 条目先过 resolveWithin 再写文件"
+  }
+}

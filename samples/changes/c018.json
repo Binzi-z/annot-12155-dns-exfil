@@ -1,0 +1,16 @@
+{
+  "id": "c018",
+  "kind": "vulnerable",
+  "file": "src/routes/backup.js",
+  "line": 22,
+  "ruleId": "PT-PATH-JOIN-002",
+  "sink": "fs.cpSync(path.join(...), path.join(...))",
+  "summary": "引入路径穿越：备份导出：目标目录名来自请求体",
+  "source": "req.body.name",
+  "entry": "POST /api/backups/export",
+  "before": "  const name = forward(req.body?.name);\n  fs.cpSync(path.join(BACKUP_DIR, \"latest\"), path.join(BACKUP_DIR, \"latest-copy\"), { recursive: true });",
+  "after": "router.post(\"/api/backups/export\", (req, res) => {\n  const name = forward(req.body?.name);\n  fs.cpSync(path.join(BACKUP_DIR, \"latest\"), path.join(BACKUP_DIR, name), { recursive: true });",
+  "expect": {
+    "vulnerable": true
+  }
+}

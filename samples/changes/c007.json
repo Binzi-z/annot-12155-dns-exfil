@@ -1,0 +1,16 @@
+{
+  "id": "c007",
+  "kind": "vulnerable",
+  "file": "src/routes/uploads.js",
+  "line": 30,
+  "ruleId": "PT-PATH-JOIN-002",
+  "sink": "fs.promises.copyFile(from, to)",
+  "summary": "引入路径穿越：附件复制：请求体两个文件名都未净化",
+  "source": "req.body.from / req.body.to",
+  "entry": "POST /api/uploads/copy",
+  "before": "  const from = path.join(UPLOAD_DIR, \"incoming\", \"draft.bin\");\n  const to = path.join(UPLOAD_DIR, \"final\", \"draft.bin\");\n  await fs.promises.copyFile(from, to);",
+  "after": "router.post(\"/api/uploads/copy\", async (req, res) => {\n  const from = path.join(UPLOAD_DIR, \"incoming\", req.body?.from || \"\");\n  const to = path.join(UPLOAD_DIR, \"final\", req.body?.to || \"\");\n  await fs.promises.copyFile(from, to);",
+  "expect": {
+    "vulnerable": true
+  }
+}

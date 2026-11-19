@@ -1,0 +1,16 @@
+{
+  "id": "c002",
+  "kind": "vulnerable",
+  "file": "src/routes/reports.js",
+  "line": 28,
+  "ruleId": "PT-FS-READ-001",
+  "sink": "fs.readFile(DATA_DIR + '/raw/' + file)",
+  "summary": "引入路径穿越：原始报表：字符串拼接后 readFile",
+  "source": "req.query.file（经 fileParam）",
+  "entry": "GET /api/reports/raw",
+  "before": "  const file = fileParam(req);\n  fs.readFile(path.join(DATA_DIR, \"raw\", \"latest.csv\"), \"utf8\", (err, data) => {",
+  "after": "  const file = fileParam(req);\n\n  // 字符串拼接后再交给 readFile\n  fs.readFile(DATA_DIR + \"/raw/\" + file, \"utf8\", (err, data) => {",
+  "expect": {
+    "vulnerable": true
+  }
+}

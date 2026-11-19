@@ -1,0 +1,16 @@
+{
+  "id": "c008",
+  "kind": "vulnerable",
+  "file": "src/routes/uploads.js",
+  "line": 36,
+  "ruleId": "PT-PATH-JOIN-002",
+  "sink": "fs.promises.rename(...)",
+  "summary": "引入路径穿越：附件改名：旧名与新名都可穿越",
+  "source": "req.body.oldName / req.body.newName",
+  "entry": "POST /api/uploads/rename",
+  "before": "  const { oldName, newName } = req.body;\n  await fs.promises.rename(\n    path.join(UPLOAD_DIR, \"final\", \"old.bin\"),\n    path.join(UPLOAD_DIR, \"final\", \"new.bin\")\n  );",
+  "after": "router.post(\"/api/uploads/rename\", async (req, res) => {\n  const { oldName, newName } = req.body;\n  await fs.promises.rename(\n    path.join(UPLOAD_DIR, \"final\", oldName),\n    path.join(UPLOAD_DIR, \"final\", newName)\n  );",
+  "expect": {
+    "vulnerable": true
+  }
+}

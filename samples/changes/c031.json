@@ -1,0 +1,15 @@
+{
+  "id": "c031",
+  "kind": "safe",
+  "file": "src/admin/uploads.js",
+  "line": 28,
+  "ruleId": "PT-PATH-JOIN-002",
+  "sink": "已净化的同类 sink",
+  "summary": "加固路径：复制前先校验 ALLOWED_UPLOADS 白名单",
+  "before": "router.post(\"/uploads/copy\", async (req, res) => {\n  const { name } = req.body;\n  await fs.promises.copyFile(\n    path.join(UPLOAD_DIR, \"incoming\", name),\n    path.join(UPLOAD_DIR, \"final\", name)\n  );\n  res.json({ ok: true });\n});",
+  "after": "router.post(\"/uploads/copy\", async (req, res) => {\n  const { name } = req.body;\n  if (!ALLOWED_UPLOADS.has(name)) {\n    return res.status(400).json({ error: \"not allowed\" });\n  }\n  await fs.promises.copyFile(\n    path.join(UPLOAD_DIR, \"incoming\", name),\n    path.join(UPLOAD_DIR, \"final\", name)\n  );",
+  "expect": {
+    "vulnerable": false,
+    "reason": "复制前先校验 ALLOWED_UPLOADS 白名单"
+  }
+}

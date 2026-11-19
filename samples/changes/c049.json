@@ -1,0 +1,13 @@
+{
+  "id": "c049",
+  "kind": "benign",
+  "file": "src/ts/report-service.ts",
+  "line": 12,
+  "summary": "请求头类型放宽到 undefined",
+  "before": "  headers: Record<string, string>;",
+  "after": "  headers: Record<string, string | undefined>;",
+  "expect": {
+    "vulnerable": false,
+    "reason": "与路径无关的重构，不涉及 sink"
+  }
+}

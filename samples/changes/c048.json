@@ -1,0 +1,13 @@
+{
+  "id": "c048",
+  "kind": "benign",
+  "file": "src/admin/uploads.js",
+  "line": 13,
+  "summary": "上传白名单新增发票",
+  "before": "const ALLOWED_UPLOADS = new Set([\"avatar.png\", \"report.csv\"]);",
+  "after": "const ALLOWED_UPLOADS = new Set([\"avatar.png\", \"report.csv\", \"invoice.pdf\"]);",
+  "expect": {
+    "vulnerable": false,
+    "reason": "与路径无关的重构，不涉及 sink"
+  }
+}

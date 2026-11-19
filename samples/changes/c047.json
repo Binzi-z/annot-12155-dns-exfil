@@ -1,0 +1,13 @@
+{
+  "id": "c047",
+  "kind": "benign",
+  "file": "src/routes/logs.js",
+  "line": 22,
+  "summary": "日志流补 error 处理",
+  "before": "  stream.pipe(res);",
+  "after": "  stream.on(\"error\", () => res.status(404).end());\n  stream.pipe(res);",
+  "expect": {
+    "vulnerable": false,
+    "reason": "与路径无关的重构，不涉及 sink"
+  }
+}

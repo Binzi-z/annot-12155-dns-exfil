@@ -1,0 +1,15 @@
+{
+  "id": "c037",
+  "kind": "safe",
+  "file": "src/ts/safe-report.ts",
+  "line": 19,
+  "ruleId": "PT-SEND-FILE-003",
+  "sink": "已净化的同类 sink",
+  "summary": "加固路径：sendFile 前已用 resolveWithin 做目录边界检查",
+  "before": "export function sendSafeExport(\n  res: { sendFile: (pathname: string) => void },\n  name: string\n): void {\n  res.sendFile(path.join(DATA_DIR, \"exports\", forward(name)));\n}",
+  "after": "export function sendSafeExport(\n  res: { sendFile: (pathname: string) => void },\n  name: string\n): void {\n  res.sendFile(resolveWithin(DATA_DIR, \"exports\", forward(name)));",
+  "expect": {
+    "vulnerable": false,
+    "reason": "sendFile 前已用 resolveWithin 做目录边界检查"
+  }
+}

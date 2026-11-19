@@ -1,0 +1,16 @@
+{
+  "id": "c003",
+  "kind": "vulnerable",
+  "file": "src/routes/reports.js",
+  "line": 36,
+  "ruleId": "PT-FS-READ-001",
+  "sink": "fs.createReadStream(path.join(...))",
+  "summary": "引入路径穿越：报表预览：路由参数直接拼路径",
+  "source": "req.params.name",
+  "entry": "GET /api/reports/preview/:name",
+  "before": "  const { name } = req.params;\n  const stream = fs.createReadStream(path.join(DATA_DIR, \"previews\", \"default.png\"));",
+  "after": "  const { name } = req.params;\n  const stream = fs.createReadStream(path.join(DATA_DIR, \"previews\", name));",
+  "expect": {
+    "vulnerable": true
+  }
+}

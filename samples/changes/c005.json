@@ -1,0 +1,16 @@
+{
+  "id": "c005",
+  "kind": "vulnerable",
+  "file": "src/routes/exports.js",
+  "line": 21,
+  "ruleId": "PT-SEND-FILE-003",
+  "sink": "res.download(path.join(...))",
+  "summary": "引入路径穿越：对账单下载：期间参数拼进归档路径",
+  "source": "req.params.period",
+  "entry": "GET /api/exports/statement/:period",
+  "before": "  const { period } = req.params;\n  const file = path.join(EXPORT_DIR, \"statements\", \"2026-01.pdf\");\n  res.download(file, \"statement.pdf\");",
+  "after": "router.get(\"/api/exports/statement/:period\", (req, res) => {\n  const { period } = req.params;\n  const file = path.join(EXPORT_DIR, \"statements\", period + \".pdf\");\n  res.download(file, \"statement.pdf\");",
+  "expect": {
+    "vulnerable": true
+  }
+}

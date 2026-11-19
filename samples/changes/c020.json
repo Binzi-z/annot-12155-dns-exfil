@@ -1,0 +1,16 @@
+{
+  "id": "c020",
+  "kind": "vulnerable",
+  "file": "src/lib/template-engine.js",
+  "line": 36,
+  "ruleId": "PT-TEMPLATE-INCLUDE-007",
+  "sink": "fs.readFileSync(path.join(TEMPLATE_DIR, 'partials', ...))",
+  "summary": "引入路径穿越：局部模板：片段名直接决定 include 文件",
+  "source": "req.body.partial（routes/templates.js）",
+  "entry": "POST /api/templates/partial",
+  "before": "function includePartial(name, data) {\n  const source = fs.readFileSync(path.join(TEMPLATE_DIR, \"partials\", \"header.hbs\"), \"utf8\");",
+  "after": "function includePartial(name, data) {\n  const source = fs.readFileSync(path.join(TEMPLATE_DIR, \"partials\", name + \".hbs\"), \"utf8\");",
+  "expect": {
+    "vulnerable": true
+  }
+}

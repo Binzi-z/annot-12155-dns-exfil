@@ -1,0 +1,15 @@
+{
+  "id": "c026",
+  "kind": "safe",
+  "file": "src/lib/template-engine.js",
+  "line": 48,
+  "ruleId": "PT-TEMPLATE-INCLUDE-007",
+  "sink": "已净化的同类 sink",
+  "summary": "加固路径：renderKnown 先从 KNOWN_TEMPLATES 取文件名，再拼 TEMPLATE_DIR",
+  "before": "function renderKnown(name, data) {\n  const source = fs.readFileSync(path.join(TEMPLATE_DIR, name + \".hbs\"), \"utf8\");\n  return fill(source, data);\n}",
+  "after": "function renderKnown(name, data) {\n  const file = KNOWN_TEMPLATES[name];\n  if (!file) {\n    throw new Error(\"unknown template: \" + name);\n  }\n  const source = fs.readFileSync(path.join(TEMPLATE_DIR, \"known\", file), \"utf8\");",
+  "expect": {
+    "vulnerable": false,
+    "reason": "renderKnown 先从 KNOWN_TEMPLATES 取文件名，再拼 TEMPLATE_DIR"
+  }
+}

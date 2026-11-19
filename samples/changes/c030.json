@@ -1,0 +1,15 @@
+{
+  "id": "c030",
+  "kind": "safe",
+  "file": "src/admin/uploads.js",
+  "line": 19,
+  "ruleId": "PT-PATH-JOIN-002",
+  "sink": "已净化的同类 sink",
+  "summary": "加固路径：落盘名先过 safeBasename（path.basename）",
+  "before": "router.post(\"/uploads\", async (req, res) => {\n  const dest = path.join(UPLOAD_DIR, \"incoming\", uploadName(req.file));\n  await fs.promises.writeFile(dest, req.file.buffer);\n  res.json({ stored: dest });\n});",
+  "after": "router.post(\"/uploads\", async (req, res) => {\n  const base = safeBasename(uploadName(req.file));\n  const dest = path.join(UPLOAD_DIR, \"incoming\", base);\n  await fs.promises.writeFile(dest, req.file.buffer);\n  res.json({ stored: base });",
+  "expect": {
+    "vulnerable": false,
+    "reason": "落盘名先过 safeBasename（path.basename）"
+  }
+}

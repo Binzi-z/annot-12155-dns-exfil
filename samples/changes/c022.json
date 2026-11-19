@@ -1,0 +1,16 @@
+{
+  "id": "c022",
+  "kind": "vulnerable",
+  "file": "src/ts/report-service.ts",
+  "line": 25,
+  "ruleId": "PT-DYNAMIC-REQUIRE-004",
+  "sink": "require(path.join(DATA_DIR, 'exporters', name))",
+  "summary": "引入路径穿越：导出器加载：函数参数直接拼模块路径",
+  "source": "loadExporter(name) 入参",
+  "entry": "loadExporter()",
+  "before": "export function loadExporter(name: string): unknown {\n  const exporter = require(path.join(DATA_DIR, \"exporters\", \"csv\"));",
+  "after": "export function loadExporter(name: string): unknown {\n  const exporter = require(path.join(DATA_DIR, \"exporters\", name));",
+  "expect": {
+    "vulnerable": true
+  }
+}

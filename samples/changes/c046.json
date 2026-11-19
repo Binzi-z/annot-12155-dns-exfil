@@ -1,0 +1,13 @@
+{
+  "id": "c046",
+  "kind": "benign",
+  "file": "src/routes/reports.js",
+  "line": 24,
+  "summary": "原始报表路由改名",
+  "before": "router.get(\"/api/reports/raw-file\", (req, res) => {",
+  "after": "router.get(\"/api/reports/raw\", (req, res) => {",
+  "expect": {
+    "vulnerable": false,
+    "reason": "与路径无关的重构，不涉及 sink"
+  }
+}

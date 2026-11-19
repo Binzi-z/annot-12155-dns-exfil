@@ -1,0 +1,15 @@
+{
+  "id": "c036",
+  "kind": "safe",
+  "file": "src/ts/safe-report.ts",
+  "line": 12,
+  "ruleId": "PT-FS-READ-001",
+  "sink": "已净化的同类 sink",
+  "summary": "加固路径：读文件前已用 resolveWithin 做目录边界检查",
+  "before": "export function readSafeReport(name: string): string {\n  return fs.readFileSync(path.join(DATA_DIR, \"reports\", forward(name)), \"utf8\");\n}",
+  "after": "export function readSafeReport(name: string): string {\n  const target = resolveWithin(DATA_DIR, \"reports\", forward(name));\n  return fs.readFileSync(target, \"utf8\");",
+  "expect": {
+    "vulnerable": false,
+    "reason": "读文件前已用 resolveWithin 做目录边界检查"
+  }
+}

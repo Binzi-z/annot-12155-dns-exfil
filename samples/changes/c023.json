@@ -1,0 +1,16 @@
+{
+  "id": "c023",
+  "kind": "vulnerable",
+  "file": "src/ts/plugin-loader.ts",
+  "line": 12,
+  "ruleId": "PT-DYNAMIC-REQUIRE-004",
+  "sink": "require(path.join(PLUGIN_ROOT, configured))",
+  "summary": "引入路径穿越：插件加载：环境变量配置决定模块路径",
+  "source": "process.env.PLUGIN_NAME",
+  "entry": "loadConfiguredPlugin()",
+  "before": "  const configured = process.env.PLUGIN_NAME || \"default\";\n  return require(path.join(PLUGIN_ROOT, \"default\"));",
+  "after": "  const configured = process.env.PLUGIN_NAME || \"default\";\n  return require(path.join(PLUGIN_ROOT, configured));",
+  "expect": {
+    "vulnerable": true
+  }
+}

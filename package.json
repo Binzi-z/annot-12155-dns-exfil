@@ -1,0 +1,22 @@
+{
+  "name": "report-gateway",
+  "version": "2.3.1",
+  "private": true,
+  "description": "报表与导出网关：JS/TS 路径穿越静态分析语料",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js",
+    "scan": "python baseline/scan.py > findings.json",
+    "eval": "python eval.py findings.json",
+    "test": "python -m pytest tests -q"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "c011",
+  "kind": "vulnerable",
+  "file": "src/routes/archive.js",
+  "line": 18,
+  "ruleId": "PT-ZIP-SLIP-006",
+  "sink": "fs.promises.writeFile(path.join(EXTRACT_DIR, entry.entryName), ...)",
+  "summary": "引入路径穿越：压缩包解压：条目路径未做边界校验",
+  "source": "zip entryName",
+  "entry": "POST /api/archive/extract",
+  "before": "  for (const entry of zip.getEntries()) {\n    const target = path.join(EXTRACT_DIR, path.basename(entry.entryName));\n    await fs.promises.writeFile(target, entry.getData());",
+  "after": "  const zip = new AdmZip(Buffer.from(req.body.archive, \"base64\"));\n  for (const entry of zip.getEntries()) {\n    await fs.promises.writeFile(path.join(EXTRACT_DIR, entry.entryName), entry.getData());",
+  "expect": {
+    "vulnerable": true
+  }
+}

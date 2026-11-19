@@ -1,0 +1,16 @@
+{
+  "id": "c016",
+  "kind": "vulnerable",
+  "file": "src/routes/logs.js",
+  "line": 21,
+  "ruleId": "PT-FS-READ-001",
+  "sink": "fs.createReadStream(LOG_DIR + ...)",
+  "summary": "引入路径穿越：按日期查日志：日期参数直接拼路径",
+  "source": "req.params.date",
+  "entry": "GET /api/logs/date/:date",
+  "before": "  const { date } = req.params;\n  const stream = fs.createReadStream(LOG_DIR + \"/2026-01-01/app.log\");",
+  "after": "router.get(\"/api/logs/date/:date\", (req, res) => {\n  const { date } = req.params;\n  const stream = fs.createReadStream(LOG_DIR + \"/\" + date + \"/app.log\");",
+  "expect": {
+    "vulnerable": true
+  }
+}

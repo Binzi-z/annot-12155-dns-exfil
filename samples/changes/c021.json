@@ -1,0 +1,16 @@
+{
+  "id": "c021",
+  "kind": "vulnerable",
+  "file": "src/ts/report-service.ts",
+  "line": 21,
+  "ruleId": "PT-FS-READ-001",
+  "sink": "fs.readFileSync(file)",
+  "summary": "引入路径穿越：多租户报表：请求头租户与查询参数共同决定文件",
+  "source": "x-tenant-id + req.query.report",
+  "entry": "readTenantReport()",
+  "before": "  const file = path.join(DATA_DIR, \"tenants\", \"acme\", \"reports\", \"summary.json\");\n  return fs.readFileSync(file, \"utf8\");",
+  "after": "  const file = path.join(DATA_DIR, \"tenants\", tenant, \"reports\", report);\n  return fs.readFileSync(file, \"utf8\");",
+  "expect": {
+    "vulnerable": true
+  }
+}

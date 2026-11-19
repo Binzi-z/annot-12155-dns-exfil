@@ -1,0 +1,16 @@
+{
+  "id": "c014",
+  "kind": "vulnerable",
+  "file": "src/routes/assets.js",
+  "line": 20,
+  "ruleId": "PT-SEND-FILE-003",
+  "sink": "res.sendFile(path.resolve(...))",
+  "summary": "引入路径穿越：资源发送：path.resolve 后未校验前缀",
+  "source": "req.query.path",
+  "entry": "GET /api/assets/file",
+  "before": "  const target = path.join(PUBLIC_DIR, \"logo.svg\");\n  res.sendFile(target);",
+  "after": "router.get(\"/api/assets/file\", (req, res) => {\n  const target = path.resolve(PUBLIC_DIR, String(req.query.path || \"\"));\n  res.sendFile(target);",
+  "expect": {
+    "vulnerable": true
+  }
+}

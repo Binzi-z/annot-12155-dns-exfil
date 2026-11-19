@@ -1,0 +1,13 @@
+{
+  "id": "c041",
+  "kind": "benign",
+  "file": "src/lib/request-params.js",
+  "line": 22,
+  "summary": "请求头读取改为可选链",
+  "before": "  const tenant = req.headers[\"x-tenant-id\"];",
+  "after": "  const tenant = req.headers?.[\"x-tenant-id\"];",
+  "expect": {
+    "vulnerable": false,
+    "reason": "与路径无关的重构，不涉及 sink"
+  }
+}

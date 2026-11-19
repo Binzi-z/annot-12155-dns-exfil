@@ -1,0 +1,16 @@
+{
+  "id": "c013",
+  "kind": "vulnerable",
+  "file": "src/routes/assets.js",
+  "line": 15,
+  "ruleId": "PT-STATIC-ROOT-005",
+  "sink": "express.static(root)",
+  "summary": "引入路径穿越：静态目录：租户参数直接作为 static 根目录",
+  "source": "req.params.tenant",
+  "entry": "USE /assets/:tenant",
+  "before": "  const root = path.join(PUBLIC_DIR, \"default\");\n  express.static(root)(req, res, next);",
+  "after": "router.use(\"/assets/:tenant\", (req, res, next) => {\n  const root = path.join(PUBLIC_DIR, req.params.tenant);\n  express.static(root)(req, res, next);",
+  "expect": {
+    "vulnerable": true
+  }
+}

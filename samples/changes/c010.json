@@ -1,0 +1,16 @@
+{
+  "id": "c010",
+  "kind": "vulnerable",
+  "file": "src/routes/plugins.js",
+  "line": 21,
+  "ruleId": "PT-DYNAMIC-REQUIRE-004",
+  "sink": "require('../../plugins/' + selected)",
+  "summary": "引入路径穿越：插件选择：字符串拼接后 require",
+  "source": "req.body.plugin",
+  "entry": "POST /api/plugins/select",
+  "before": "  const { plugin: selected } = req.body;\n  const mod = require(\"../../plugins/csv\");",
+  "after": "router.post(\"/api/plugins/select\", (req, res) => {\n  const { plugin: selected } = req.body;\n  const mod = require(\"../../plugins/\" + forward(selected));",
+  "expect": {
+    "vulnerable": true
+  }
+}

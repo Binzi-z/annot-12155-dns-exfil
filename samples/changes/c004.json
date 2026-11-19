@@ -1,0 +1,16 @@
+{
+  "id": "c004",
+  "kind": "vulnerable",
+  "file": "src/routes/exports.js",
+  "line": 15,
+  "ruleId": "PT-SEND-FILE-003",
+  "sink": "res.sendFile(path.join(...))",
+  "summary": "引入路径穿越：发票下载：动态路径交给 sendFile",
+  "source": "req.query.invoice",
+  "entry": "GET /api/exports/invoice",
+  "before": "  const name = forward(req.query.invoice);\n  return res.sendFile(path.join(EXPORT_DIR, \"invoices\", \"sample.pdf\"));",
+  "after": "router.get(\"/api/exports/invoice\", (req, res) => {\n  const name = forward(req.query.invoice);\n  // 动态路径直接交给 sendFile\n  return res.sendFile(path.join(EXPORT_DIR, \"invoices\", name));",
+  "expect": {
+    "vulnerable": true
+  }
+}

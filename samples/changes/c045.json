@@ -1,0 +1,13 @@
+{
+  "id": "c045",
+  "kind": "benign",
+  "file": "src/routes/uploads.js",
+  "line": 16,
+  "summary": "上传大小上限从 5MB 调整到 10MB",
+  "before": "  limits: { fileSize: 5 * 1024 * 1024 },",
+  "after": "  limits: { fileSize: 10 * 1024 * 1024 },",
+  "expect": {
+    "vulnerable": false,
+    "reason": "与路径无关的重构，不涉及 sink"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "c035",
+  "kind": "safe",
+  "file": "src/admin/backup.js",
+  "line": 15,
+  "ruleId": "PT-PATH-JOIN-002",
+  "sink": "已净化的同类 sink",
+  "summary": "加固路径：快照名先过 resolveWithin 再复制",
+  "before": "router.post(\"/backups/restore\", (req, res) => {\n  const name = forward(req.body?.snapshot);\n  fs.copyFileSync(path.join(BACKUP_DIR, name), path.join(BACKUP_DIR, \"restored.db\"));\n  res.json({ restored: true });\n});",
+  "after": "router.post(\"/backups/restore\", (req, res) => {\n  const name = forward(req.body?.snapshot);\n  const src = resolveWithin(BACKUP_DIR, name);\n  fs.copyFileSync(src, path.join(BACKUP_DIR, \"restored.db\"));",
+  "expect": {
+    "vulnerable": false,
+    "reason": "快照名先过 resolveWithin 再复制"
+  }
+}

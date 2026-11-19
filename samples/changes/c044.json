@@ -1,0 +1,13 @@
+{
+  "id": "c044",
+  "kind": "benign",
+  "file": "src/lib/registry.js",
+  "line": 11,
+  "summary": "插件白名单新增 xlsx",
+  "before": "const ALLOWED_PLUGINS = new Set([\"csv\", \"pdf\"]);",
+  "after": "const ALLOWED_PLUGINS = new Set([\"csv\", \"pdf\", \"xlsx\"]);",
+  "expect": {
+    "vulnerable": false,
+    "reason": "与路径无关的重构，不涉及 sink"
+  }
+}

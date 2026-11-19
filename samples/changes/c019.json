@@ -1,0 +1,16 @@
+{
+  "id": "c019",
+  "kind": "vulnerable",
+  "file": "src/lib/template-engine.js",
+  "line": 28,
+  "ruleId": "PT-TEMPLATE-INCLUDE-007",
+  "sink": "fs.readFileSync(path.join(TEMPLATE_DIR, name + '.hbs'))",
+  "summary": "引入路径穿越：模板渲染：主题名直接决定 include 文件",
+  "source": "req.query.theme（routes/templates.js）",
+  "entry": "GET /api/templates/preview",
+  "before": "function renderTemplate(name, data) {\n  const source = fs.readFileSync(path.join(TEMPLATE_DIR, \"report.hbs\"), \"utf8\");",
+  "after": "function renderTemplate(name, data) {\n  const source = fs.readFileSync(path.join(TEMPLATE_DIR, name + \".hbs\"), \"utf8\");",
+  "expect": {
+    "vulnerable": true
+  }
+}
